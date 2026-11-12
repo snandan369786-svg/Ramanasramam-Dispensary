@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "ramana-dev", "runtimeExecutable": "npm", "runtimeArgs": ["--prefix", "/Users/snandan/Desktop/ramana-dispensary", "run", "dev"], "port": 3000 }
+  ]
+}

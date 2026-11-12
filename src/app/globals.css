@@ -1,0 +1,215 @@
+@import "tailwindcss";
+
+/* ── Brand tokens ─────────────────────────────────────────────────────────── */
+@theme {
+  --color-ivory: #f8f5ee;
+  --color-ivory-deep: #f0ebdf;
+  --color-paper: #fcfaf5;
+  --color-forest: #1f3b2f;
+  --color-forest-deep: #132820;
+  --color-forest-soft: #2c4d3e;
+  --color-sage: #8a9b83;
+  --color-sage-light: #dfe5d8;
+  --color-sage-mist: #eef1ea;
+  --color-gold: #a8844a;
+  --color-gold-light: #d6bf8f;
+  --color-ink: #1c231f;
+  --color-muted: #59625c;
+  --color-line: #e2dccd;
+
+  --font-serif: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-body), "Inter", system-ui, sans-serif;
+
+  --tracking-label: 0.22em;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-ivory);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Cormorant defaults to old-style figures; lining figures read better for times */
+    font-variant-numeric: lining-nums;
+  }
+
+  ::selection {
+    background: var(--color-sage-light);
+    color: var(--color-forest-deep);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container-page {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .display {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.04;
+  }
+
+  .hairline {
+    height: 1px;
+    background: var(--color-line);
+  }
+
+  /* Subtle paper grain for warmth — pure CSS, no image request */
+  .grain {
+    position: relative;
+    isolation: isolate;
+  }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: radial-gradient(
+      rgba(31, 59, 47, 0.045) 1px,
+      transparent 1px
+    );
+    background-size: 3px 3px;
+  }
+}
+
+/* ── Reveal-on-scroll (progressive enhancement) ───────────────────────────── */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.hero-zoom {
+  animation: hero-zoom 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fade-up {
+  animation: fade-up 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+/* Health Atlas */
+@keyframes atlas-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  70%,
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+@keyframes atlas-flow {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--flow, 40px));
+  }
+}
+@keyframes atlas-beat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.12);
+  }
+  30% {
+    transform: scale(0.98);
+  }
+}
+.atlas-diagram * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.atlas-diagram .t {
+  transition:
+    opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+    fill 0.7s ease,
+    stroke 0.7s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-diagram .t {
+    transition: none;
+  }
+  .atlas-diagram [class*="animate-"] {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  .js .reveal,
+  .js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .hero-zoom,
+  .fade-up {
+    animation: none;
+  }
+}
