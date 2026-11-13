@@ -21,47 +21,95 @@ function MythCard({ item, index }: { item: Item; index: number }) {
             Statement {String(index + 1).padStart(2, "0")}
           </span>
           {item.condition && (
-            <span className="eyebrow text-[0.62rem] text-gold">{item.condition.name}</span>
+            <span className="eyebrow text-[0.62rem] text-gold">
+              {item.condition.name}
+            </span>
           )}
         </div>
         <p className="mt-5 font-serif text-[1.55rem] leading-snug text-forest-deep">
           “{item.statement}”
         </p>
 
-        {!revealed ? (
-          <div className="mt-auto pt-8">
-            <p className="text-[0.8rem] text-muted">Myth or fact? Make your choice to reveal the answer.</p>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              {(["myth", "fact"] as const).map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setGuess(v)}
-                  className="rounded-[4px] border border-forest/25 py-3 text-[0.84rem] font-medium capitalize text-forest transition-all duration-300 hover:border-forest hover:bg-forest hover:text-ivory"
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
+        <div className="mt-auto pt-8">
+          <p className="text-[0.8rem] text-muted">
+            {revealed
+              ? "Myth or fact?"
+              : "Myth or fact? Make your choice to reveal the answer."}
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            {(["myth", "fact"] as const).map((v) => {
+              const chosen = guess === v;
+              const isAnswer = item.verdict === v;
+              const wrongPick = revealed && chosen && !isAnswer;
+              const rightAnswer = revealed && isAnswer;
+              const style = !revealed
+                ? "border-forest/25 text-forest hover:border-forest hover:bg-forest hover:text-ivory"
+                : rightAnswer
+                  ? "border-forest bg-forest text-ivory"
+                  : wrongPick
+                    ? "border-[#9b3b2f] bg-[#9b3b2f] text-ivory"
+                    : "border-forest/15 text-forest/40";
+              return (
+                <div key={v} className="flex flex-col items-center">
+                  <button
+                    type="button"
+                    onClick={() => setGuess(v)}
+                    disabled={revealed}
+                    aria-pressed={chosen}
+                    className={`inline-flex w-full items-center justify-center gap-2 rounded-[4px] border py-3 text-[0.84rem] font-medium capitalize transition-all duration-300 disabled:cursor-default ${style}`}
+                  >
+                    {rightAnswer && (
+                      <Check aria-hidden className="h-4 w-4" strokeWidth={2} />
+                    )}
+                    {wrongPick && (
+                      <X aria-hidden className="h-4 w-4" strokeWidth={2} />
+                    )}
+                    {v}
+                  </button>
+                  {revealed && (
+                    <span
+                      className={`mt-1.5 text-[0.72rem] ${
+                        wrongPick
+                          ? "text-[#9b3b2f]"
+                          : rightAnswer
+                            ? "text-forest"
+                            : "text-transparent"
+                      }`}
+                    >
+                      {wrongPick
+                        ? "Your answer"
+                        : rightAnswer
+                          ? chosen
+                            ? "Your answer · right"
+                            : "Right answer"
+                          : "–"}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        ) : (
-          <div className="mt-auto pt-8" aria-live="polite">
-            <div className="flex items-center gap-3">
-              <span
-                className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[0.75rem] font-semibold uppercase tracking-[0.16em] ${
-                  isMyth ? "bg-forest-deep text-gold-light" : "bg-sage-light text-forest-deep"
-                }`}
+
+          {revealed && (
+            <div aria-live="polite">
+              <p
+                className={`fade-up mt-5 inline-flex items-center gap-1.5 text-[0.9rem] font-semibold ${correct ? "text-forest" : "text-[#9b3b2f]"}`}
               >
-                {isMyth ? <X aria-hidden className="h-3.5 w-3.5" strokeWidth={2} /> : <Check aria-hidden className="h-3.5 w-3.5" strokeWidth={2} />}
-                {isMyth ? "Myth" : "Fact"}
-              </span>
-              <span className="text-[0.82rem] text-muted">
-                {correct ? "You got it." : "Not quite."}
-              </span>
+                {correct ? (
+                  <Check aria-hidden className="h-4 w-4" strokeWidth={2} />
+                ) : (
+                  <X aria-hidden className="h-4 w-4" strokeWidth={2} />
+                )}
+                {correct
+                  ? `Correct, this is a ${isMyth ? "myth" : "fact"}.`
+                  : `Not quite, this is actually a ${isMyth ? "myth" : "fact"}.`}
+              </p>
+              <p className="fade-up mt-2 text-[0.95rem] leading-relaxed text-ink/85">
+                {item.explanation}
+              </p>
             </div>
-            <p className="fade-up mt-4 text-[0.95rem] leading-relaxed text-ink/85">{item.explanation}</p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {(revealed || item.condition) && (
@@ -72,7 +120,11 @@ function MythCard({ item, index }: { item: Item; index: number }) {
               className="group inline-flex items-center gap-1.5 text-[0.8rem] font-medium text-forest"
             >
               Read about {item.condition.name}
-              <ArrowRight aria-hidden className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" strokeWidth={1.6} />
+              <ArrowRight
+                aria-hidden
+                className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+                strokeWidth={1.6}
+              />
             </Link>
           ) : (
             <span />
@@ -83,7 +135,11 @@ function MythCard({ item, index }: { item: Item; index: number }) {
               onClick={() => setGuess(null)}
               className="inline-flex items-center gap-1.5 text-[0.78rem] text-muted hover:text-forest"
             >
-              <RotateCcw aria-hidden className="h-3.5 w-3.5" strokeWidth={1.6} />
+              <RotateCcw
+                aria-hidden
+                className="h-3.5 w-3.5"
+                strokeWidth={1.6}
+              />
               Try again
             </button>
           )}
